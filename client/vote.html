@@ -1,0 +1,28 @@
+<h2>Vote for your favorite</h2>
+<select id="candidate">
+  <option value="Candidate A">Candidate A</option>
+  <option value="Candidate B">Candidate B</option>
+</select>
+<button onclick="vote()">Submit Vote</button>
+<h3>Results:</h3>
+<ul id="results"></ul>
+<script>
+  async function vote() {
+    const candidate = document.getElementById('candidate').value;
+    const userId = localStorage.getItem('userId');
+    const res = await fetch('http://localhost:5000/api/vote', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userId, candidate })
+    });
+    const data = await res.json();
+    alert(data.message || data.error);
+    loadResults();
+  }
+  async function loadResults() {
+    const res = await fetch('http://localhost:5000/api/vote/results');
+    const data = await res.json();
+    document.getElementById('results').innerHTML = data.map(d => `<li>${d._id}: ${d.votes} votes</li>`).join('');
+  }
+  loadResults();
+</script>
